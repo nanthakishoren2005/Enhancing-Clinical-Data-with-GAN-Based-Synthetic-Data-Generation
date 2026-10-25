@@ -1,0 +1,56 @@
+# ==============================================================================
+# Configuration file for COVID-19 & Pulmonary Disease Classification with GAN Augmentation
+# ==============================================================================
+
+project:
+  title: "GAN-Based Synthetic Medical Image Augmentation for Multiclass COVID-19 & Pulmonary Disease Classification"
+  version: "2.0.0"
+  random_seed: 42
+
+dataset:
+  classes:
+    - "normal"
+    - "covid"
+    - "lung_opacity"
+    - "viral_pneumonia"
+  num_classes: 4
+  image_size: 128
+  channels: 3
+  mean: [0.485, 0.456, 0.406]
+  std: [0.229, 0.224, 0.225]
+  original_dir: "data/original"
+  synthetic_dir: "data/synthetic"
+
+gan:
+  latent_dim: 100
+  embedding_dim: 32
+  gen_feature_maps: 64
+  disc_feature_maps: 64
+  lr_g: 0.0002
+  lr_d: 0.0002
+  beta1: 0.5
+  beta2: 0.999
+  batch_size: 32
+  epochs: 50
+  save_sample_interval: 2
+  num_synthetic_per_class: 40
+
+cnn:
+  architecture: "resnet18"     # Options: 'resnet18', 'custom_cnn'
+  pretrained: true             # Use ImageNet initialization for transfer learning
+  freeze_backbone: false
+  batch_size: 32
+  learning_rate: 0.0003
+  weight_decay: 0.0001
+  epochs: 15
+  early_stopping_patience: 5
+
+paths:
+  checkpoints_dir: "checkpoints"
+  figures_dir: "outputs/figures"
+  reports_dir: "outputs/reports"
+  samples_dir: "outputs/gan_samples"
+
+hardware:
+  device: "auto"               # 'auto', 'cuda', or 'cpu'
+  num_workers: 0               # 0 is safe across Windows PowerShell and multi-processing

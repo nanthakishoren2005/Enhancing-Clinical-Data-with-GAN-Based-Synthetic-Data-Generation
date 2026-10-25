@@ -1,0 +1,28 @@
+{
+  "calibrated_on": "data/original/val",
+  "sample_count": 400,
+  "classes": [
+    "normal",
+    "covid",
+    "lung_opacity",
+    "viral_pneumonia"
+  ],
+  "model_type": "augmented",
+  "energy_score": {
+    "mean": -5.696954537630081,
+    "std": 3.0986760777242477,
+    "ood_threshold": -1.792
+  },
+  "predictive_entropy": {
+    "mean": 0.20515626362868533,
+    "ambiguity_threshold": 0.531
+  },
+  "top2_margin": {
+    "mean": 0.8166663581132889,
+    "ambiguity_threshold": 0.488
+  },
+  "color_dispersion": {
+    "mean": 0.0,
+    "non_radiograph_threshold": 12.0
+  }
+}
