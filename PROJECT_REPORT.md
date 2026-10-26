@@ -59,7 +59,7 @@ The proposed framework employs a rigorous, controlled comparative protocol:
 ```text
 +---------------------------------------------------------------+
 |                    Original Chest X-ray Dataset               |
-|                  (Patient-Grouped Partition)                  |
+|           (Random Image-Level Partition, seed 42)             |
 +---------------------------------------------------------------+
               |                                    |
               v                                    v
@@ -100,7 +100,7 @@ The proposed framework employs a rigorous, controlled comparative protocol:
 #### Key Procedural Controls:
 
 1. **Zero Data Leakage:** Validation and test splits consist strictly of untouched real chest X-ray images.
-2. **Patient Isolation:** Images from the same patient are kept in the same split to prevent cross-image memorization.
+2. Random image-level splits (seed 42): images were randomly assigned to train, validation, and test partitions. Splits are image-level, not patient-grouped.
 3. **Identical Hyperparameters:** Both Model A and Model B use identical network architectures, optimizers, learning rate schedules, and loss functions.
 4. **Honest Reporting:** Both Experiment 1 (40 synthetic/class) and Experiment 2 (100 synthetic/class) results are reported; no claim is made that GAN augmentation exceeded Baseline performance.
 
@@ -169,7 +169,7 @@ GAN augmentation did not outperform the Baseline on the held-out test set. Exper
 
 ### 9. Conclusion
 
-This project demonstrates that conditional generative data augmentation through a cDCGAN can recover near-baseline performance when sufficient synthetic samples are generated (100 per class), but does not exceed Baseline performance on the held-out test set. A smaller synthetic set (40 per class) degraded performance due to class confusion between Normal and Lung Opacity. These findings were demonstrated under strict experimental control without test-set contamination or patient data leakage.
+This project demonstrates that conditional generative data augmentation through a cDCGAN can recover near-baseline performance when sufficient synthetic samples are generated (100 per class), but does not exceed Baseline performance on the held-out test set. A smaller synthetic set (40 per class) degraded performance due to class confusion between Normal and Lung Opacity. These findings were demonstrated under strict experimental control without test-set contamination or data leakage.
 
 ---
 

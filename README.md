@@ -51,7 +51,7 @@ Small medical imaging datasets restrict deep convolutional neural networks from 
 
 1. **Develop a Class-Conditional DCGAN** capable of mapping latent vectors and class labels to 128 x 128 chest X-ray region-of-interest patches.
 2. **Establish a Controlled Experimental Protocol** comparing a Baseline CNN (Model A) against a GAN-Augmented CNN (Model B).
-3. **Enforce Strict Anti-Leakage Separation:** Ensure validation and test sets consist solely of real, untouched chest X-ray images, grouping patient slices together.
+3. **Enforce Strict Anti-Leakage Separation:** Ensure validation and test sets consist solely of real, untouched chest X-ray images. Random image-level splits (seed 42): images were randomly assigned to train, validation, and test partitions. Splits are image-level, not patient-grouped.
 4. **Conduct Rigorous Statistical Evaluation:** Calculate multiclass Accuracy, Macro F1, Confusion Matrices, and One-vs-Rest (OvR) Sensitivity and Specificity.
 5. **Provide an Interactive Streamlit Web Platform** featuring dataset inspection, live training controls, model comparison, chest X-ray prediction inference, and automated report exports.
 
@@ -75,7 +75,7 @@ The project uses the **COVID-19 Radiography Database** (Kaggle), a chest X-ray d
 - Image size: 128 x 128 pixels
 
 **Anti-Leakage Rules:**
-1. **Patient-Level Grouping:** All images belonging to the same patient remain strictly inside the same partition.
+1. Random image-level splits (seed 42): images were randomly assigned to train, validation, and test partitions. Splits are image-level, not patient-grouped.
 2. **Purity of Evaluation Sets:** Validation and Test splits are populated exclusively with untouched real chest X-ray images.
 3. **Synthetic Training Bound:** GAN-generated images are deposited solely in `data/synthetic/train/`.
 
@@ -122,11 +122,13 @@ Both Model A and Model B use ResNet-18 with identical hyperparameters:
 | Model A: Baseline CNN | 0 | 0 | 92.75% | 0.9277 |
 | Model B: Experiment 1 | 40 | 160 | 88.50% | 0.8833 |
 | Model B: Experiment 2 | 100 | 400 | 92.50% | 0.9248 |
+| Phase 1: cDCGAN 256x256 | 100 | 400 | 94.00% | 0.9405 |
 
 ### Key Findings
 
 - **Experiment 1 (40 synthetic/class):** Hurt accuracy compared to Baseline. Normal recall dropped to 0.69 due to Normal vs Lung Opacity confusion.
 - **Experiment 2 (100 synthetic/class):** Fixed the Normal vs Lung Opacity confusion (Normal recall improved to 0.90) and matched the Baseline within 1 test image (92.50% vs 92.75%).
+- Phase 1 (256x256 cDCGAN) beat the Baseline (94.00% vs 92.75%), but it changed input resolution (128 to 256) and synthetic augmentation together, so the gain cannot be credited to synthetic data alone. A 256 real-only control would be needed to separate the two effects.
 - **Conclusion:** GAN augmentation did not beat the Baseline. The larger synthetic set (100 per class) recovered performance to near-baseline levels but did not exceed it. Both experiments are reported honestly; no claim is made that GAN augmentation improved over the Baseline.
 
 ---
@@ -205,6 +207,8 @@ py -m streamlit run app.py
 - **Page 4: Model Comparison (`4_Model_Comparison.py`):** Head-to-head metrics table, accuracy delta, side-by-side confusion matrices, and sensitivity/specificity breakdowns.
 - **Page 5: Diagnosis & Risk Rate (`5_Prediction.py`):** Chest X-ray classification (Normal vs Diseased / Specific Pathology), calibrated quantitative Risk Rate (%), dynamic visual risk meter, Grad-CAM++ visual interpretability, predictive-entropy uncertainty detection, radiomic biomarker extraction, actionable clinical management recommendations, and clinical diagnostic summary report download.
 - **Page 6: Reports (`6_Reports.py`):** Downloadable CSV tables, training history logs, and formatted experimental summaries.
+- **Phase 1: 256x256 Experiment (`6_Phase1_256.py`):** 256x256 Conditional DCGAN synthetic augmentation experiment with ResNet-18 classifier on 256x256 inputs, metric cards, confusion matrix heatmaps, per-class comparison, and generated sample grids.
+- **Compare: Baseline model vs cDCGAN 256x256 (`7_Compare_Baseline_vs_cDCGAN_256.py`):** Unified comparison page featuring side-by-side metric comparison, dual prediction with Grad-CAM++ explainability, disease details, uncertainty estimation, and generated samples.
 
 ---
 
