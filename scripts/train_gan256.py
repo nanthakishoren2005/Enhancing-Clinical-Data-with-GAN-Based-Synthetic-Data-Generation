@@ -246,6 +246,29 @@ def plot_loss_curve(history: Dict[str, List[float]], save_path: Path) -> None:
     plt.close()
 
 
+def plot_cnn_history(history: Dict[str, Any], exp_name: str, save_path: Path) -> None:
+    """Plot and save CNN training & validation loss and accuracy curves."""
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4.5))
+    epochs = history["epochs"]
+    ax1.plot(epochs, history["train_loss"], label="Train Loss", color="#e74c3c", lw=2)
+    ax1.plot(epochs, history["val_loss"], label="Val Loss", color="#2980b9", lw=2, linestyle="--")
+    ax1.set_title(f"{exp_name.title()} - Cross-Entropy Loss", fontsize=11, fontweight="bold")
+    ax1.set_xlabel("Epoch")
+    ax1.set_ylabel("Loss")
+    ax1.legend()
+    ax1.grid(True, linestyle=":", alpha=0.6)
+    ax2.plot(epochs, [a * 100 for a in history["train_acc"]], label="Train Acc", color="#27ae60", lw=2)
+    ax2.plot(epochs, [a * 100 for a in history["val_acc"]], label="Val Acc", color="#8e44ad", lw=2, linestyle="--")
+    ax2.set_title(f"{exp_name.title()} - Classification Accuracy (%)", fontsize=11, fontweight="bold")
+    ax2.set_xlabel("Epoch")
+    ax2.set_ylabel("Accuracy (%)")
+    ax2.legend()
+    ax2.grid(True, linestyle=":", alpha=0.6)
+    plt.tight_layout()
+    plt.savefig(save_path, dpi=200)
+    plt.close()
+
+
 def generate_synthetic_256(num_per_class: int = 100, checkpoint_path: Optional[Path] = None) -> Dict[str, int]:
     """
     Generate 100 synthetic chest X-ray images per class using the trained 256x256 cDCGAN.
