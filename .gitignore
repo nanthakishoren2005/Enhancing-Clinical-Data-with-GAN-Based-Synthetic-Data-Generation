@@ -36,8 +36,8 @@ data/synthetic/
 !data/sample_scans/
 
 # Model Checkpoints (GitHub rejects files >100MB)
-checkpoints/*.pt
-checkpoints/*.pth
+*.pt
+*.pth
 !checkpoints/.gitkeep
 
 # Outputs

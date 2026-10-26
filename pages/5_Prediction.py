@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 from src.utils.config import load_config, get_project_root
 from src.utils.disease_knowledge import get_disease_details
 from src.data.dataset import CLASS_TO_IDX
-from src.cnn.predict import analyze_chest_xray, load_trained_model
+from src.cnn.predict import analyze_liver_scan, load_trained_model
 from src.explainability.gradcam import generate_gradcampp_explanation, colorize_heatmap, blend_heatmap_overlay
 from src.uncertainty.detector import UncertaintyDetector
 from src.ui.styles import apply_theme
@@ -184,7 +184,7 @@ with tab_samples:
     sc1, sc2, sc3, sc4 = st.columns(4)
     
     with sc1:
-        if st.button(" Normal Scan", use_container_width=True):
+        if st.button(" Normal Scan", width="stretch"):
             p = sample_dir / "sample_normal.png"
             if not p.exists():
                 p = sample_dir / "sample_normal.jpg"
@@ -192,7 +192,7 @@ with tab_samples:
                 st.session_state["active_scan_img"] = Image.open(p)
                 st.session_state["active_scan_label"] = "Sample Case: Normal Lung Fields (Healthy)"
     with sc2:
-        if st.button(" COVID-19 Positive", use_container_width=True):
+        if st.button(" COVID-19 Positive", width="stretch"):
             p = sample_dir / "sample_covid.png"
             if not p.exists():
                 p = sample_dir / "sample_covid.jpg"
@@ -200,7 +200,7 @@ with tab_samples:
                 st.session_state["active_scan_img"] = Image.open(p)
                 st.session_state["active_scan_label"] = "Sample Case: COVID-19 (SARS-CoV-2 Acute Infection)"
     with sc3:
-        if st.button(" Pulmonary Opacity", use_container_width=True):
+        if st.button(" Pulmonary Opacity", width="stretch"):
             p = sample_dir / "sample_lung_opacity.png"
             if not p.exists():
                 p = sample_dir / "sample_lung_opacity.jpg"
@@ -208,7 +208,7 @@ with tab_samples:
                 st.session_state["active_scan_img"] = Image.open(p)
                 st.session_state["active_scan_label"] = "Sample Case: Pulmonary Opacity (Alveolar Infiltration)"
     with sc4:
-        if st.button(" Viral Pneumonia", use_container_width=True):
+        if st.button(" Viral Pneumonia", width="stretch"):
             p = sample_dir / "sample_viral_pneumonia.png"
             if not p.exists():
                 p = sample_dir / "sample_viral_pneumonia.jpg"
@@ -219,19 +219,19 @@ with tab_samples:
     st.markdown("<div style='margin-top: 0.9rem; font-weight: 700; color: #0f172a; font-size: 0.92rem;'>Star Diagnostic Discrepancy & Subtle Lesion Challenges (Demonstrating Model B Advantage):</div>", unsafe_allow_html=True)
     ch1, ch2, ch3 = st.columns(3)
     with ch1:
-        if st.button("High Voltage Subtle COVID Case (Model A Fails vs Model B Resolves)", use_container_width=True):
+        if st.button("High Voltage Subtle COVID Case (Model A Fails vs Model B Resolves)", width="stretch"):
             p = sample_dir / "challenge_covid_subtle.png"
             if p.exists():
                 st.session_state["active_scan_img"] = Image.open(p)
                 st.session_state["active_scan_label"] = "Challenge Scan: Subtle Ground-Glass COVID-19 Infiltration (COVID-1749)"
     with ch2:
-        if st.button("High Voltage Complex Normal Scan (Model A False-Positive vs Model B Clears)", use_container_width=True):
+        if st.button("High Voltage Complex Normal Scan (Model A False-Positive vs Model B Clears)", width="stretch"):
             p = sample_dir / "challenge_normal_complex.png"
             if p.exists():
                 st.session_state["active_scan_img"] = Image.open(p)
                 st.session_state["active_scan_label"] = "Challenge Scan: Healthy Parenchyma with Perihilar Markings (Normal-3499)"
     with ch3:
-        if st.button("High Voltage Prominent Bronchial Scan (Model A Misdiagnoses Viral Pneumonia)", use_container_width=True):
+        if st.button("High Voltage Prominent Bronchial Scan (Model A Misdiagnoses Viral Pneumonia)", width="stretch"):
             p = sample_dir / "challenge_normal_subtle.png"
             if p.exists():
                 st.session_state["active_scan_img"] = Image.open(p)
@@ -268,14 +268,14 @@ if selected_pil_img is not None:
         t_start = time.perf_counter()
         with st.spinner("Executing synchronized dual-model forward pass and Grad-CAM++ attribution..."):
             try:
-                analysis_a = analyze_chest_xray(
+                analysis_a = analyze_liver_scan(
                     image_input=selected_pil_img,
                     model_type="baseline",
                     checkpoint_path=base_ckpt,
                     generate_xai=True,
                     assess_uncertainty=True,
                 )
-                analysis_b = analyze_chest_xray(
+                analysis_b = analyze_liver_scan(
                     image_input=selected_pil_img,
                     model_type="augmented",
                     checkpoint_path=aug_ckpt,
@@ -394,17 +394,17 @@ if selected_pil_img is not None:
         cam_c1, cam_c2, cam_c3 = st.columns(3)
         with cam_c1:
             st.markdown("<div style='text-align:center; font-weight:700; margin-bottom: 6px;'>Patient Radiograph</div>", unsafe_allow_html=True)
-            st.image(selected_pil_img, caption=img_source_label, use_container_width=True)
+            st.image(selected_pil_img, caption=img_source_label, width="stretch")
         with cam_c2:
             st.markdown("<div style='text-align:center; font-weight:700; color:#0284c7; margin-bottom: 6px;'>Model A (Baseline CNN) Overlay</div>", unsafe_allow_html=True)
             if expl_a and "overlay_image" in expl_a:
-                st.image(expl_a["overlay_image"], caption=f"Model A: {pred_a} ({conf_a:.1f}%)", use_container_width=True)
+                st.image(expl_a["overlay_image"], caption=f"Model A: {pred_a} ({conf_a:.1f}%)", width="stretch")
             else:
                 st.info("Grad-CAM++ overlay not computed")
         with cam_c3:
             st.markdown("<div style='text-align:center; font-weight:700; color:#10b981; margin-bottom: 6px;'>Model B (GAN-Augmented) Overlay</div>", unsafe_allow_html=True)
             if expl_b and "overlay_image" in expl_b:
-                st.image(expl_b["overlay_image"], caption=f"Model B: {pred_b} ({conf_b:.1f}%)", use_container_width=True)
+                st.image(expl_b["overlay_image"], caption=f"Model B: {pred_b} ({conf_b:.1f}%)", width="stretch")
             else:
                 st.info("Grad-CAM++ overlay not computed")
 
@@ -450,7 +450,7 @@ if selected_pil_img is not None:
                                xytext=(4, 0), textcoords="offset points", ha="left", va="center", fontsize=8, color="#047857", fontweight="bold")
 
         plt.tight_layout()
-        st.pyplot(fig_cmp, use_container_width=True)
+        st.pyplot(fig_cmp, width="stretch")
         plt.close(fig_cmp)
 
         # 5. Side-by-Side Technical Comparison Table
@@ -463,7 +463,7 @@ if selected_pil_img is not None:
             {"Dimension": "Data Augmentation", "Model A: Baseline CNN": "Affine Transforms Only", "Model B: GAN-Augmented CNN": "cDCGAN Generative Augmentation", "Advantage / Clinical Note": "Learns Realistic Tissue Necrosis & Infiltrates"},
             {"Dimension": "Test Set Accuracy", "Model A: Baseline CNN": "86.50%", "Model B: GAN-Augmented CNN": "89.50%", "Advantage / Clinical Note": "+3.00% Absolute Empirical Gain"},
         ]
-        st.dataframe(pd.DataFrame(cmp_rows), use_container_width=True)
+        st.dataframe(pd.DataFrame(cmp_rows), width="stretch")
         st.stop()
 
     # -----------------------------------------------------------------
@@ -471,7 +471,7 @@ if selected_pil_img is not None:
     # -----------------------------------------------------------------
     t_start = time.perf_counter()
     try:
-        analysis = analyze_chest_xray(
+        analysis = analyze_liver_scan(
             image_input=selected_pil_img,
             model_type=model_choice,
             checkpoint_path=ckpt_file,
@@ -740,11 +740,11 @@ if selected_pil_img is not None:
             # Display 3 side-by-side images
             col_c1, col_c2, col_c3 = st.columns(3)
             with col_c1:
-                st.image(expl["original_image"], caption="1. Original Patient Radiograph", use_container_width=True)
+                st.image(expl["original_image"], caption="1. Original Patient Radiograph", width="stretch")
             with col_c2:
-                st.image(expl["heatmap_image"], caption=f"2. Grad-CAM++ Saliency Heatmap ({xai_cmap.upper()})", use_container_width=True)
+                st.image(expl["heatmap_image"], caption=f"2. Grad-CAM++ Saliency Heatmap ({xai_cmap.upper()})", width="stretch")
             with col_c3:
-                st.image(expl["overlay_image"], caption=f"3. Heatmap Overlaid on Anatomy (Alpha: {xai_alpha})", use_container_width=True)
+                st.image(expl["overlay_image"], caption=f"3. Heatmap Overlaid on Anatomy (Alpha: {xai_alpha})", width="stretch")
 
             st.caption(f"**Target Layer:** `{expl['target_layer_name']}` | **Method:** Grad-CAM++ (Chattopadhay et al., 2018) | **Target Class Explaining:** `{expl['target_class_name'].replace('_', ' ').title()}`")
         except Exception as e:
@@ -767,7 +767,7 @@ if selected_pil_img is not None:
     with col_vis:
         st.subheader("Radiomic Density Analysis")
         heat_img = fast_density_heatmap(selected_pil_img)
-        st.image(heat_img, caption="Tissue Attenuation Density Profile (Inferno)", use_container_width=True)
+        st.image(heat_img, caption="Tissue Attenuation Density Profile (Inferno)", width="stretch")
         st.caption(f"**Image Dimensions:** {selected_pil_img.size[0]} × {selected_pil_img.size[1]} px | **Source:** {img_source_label}")
 
     with col_stats:
@@ -817,7 +817,7 @@ if selected_pil_img is not None:
         ax_bar.spines["top"].set_visible(False)
         ax_bar.spines["right"].set_visible(False)
         plt.tight_layout()
-        st.pyplot(fig_bar, use_container_width=True)
+        st.pyplot(fig_bar, width="stretch")
         plt.close(fig_bar)
 
         st.markdown(f"**Clinical Urgency Assessment:** `{urgency}`")
@@ -825,7 +825,7 @@ if selected_pil_img is not None:
 
     # 6. Radiomic Biomarker Extraction Card
     st.markdown("---")
-    st.subheader("Extracted Radiomic Biomarkers & X-ray Characteristics")
+    st.subheader("Extracted Radiomic Biomarkers & CT Characteristics")
     r1, r2, r3, r4 = st.columns(4)
     with r1:
         st.metric(
@@ -1037,7 +1037,7 @@ ACADEMIC NOTICE:
         data=report_text,
         file_name=f"scan_diagnostic_uncertainty_report_{disease_status.lower()}.txt",
         mime="text/plain",
-        use_container_width=True,
+        width="stretch",
     )
 
 else:

@@ -1,0 +1,7 @@
+seed,model,epochs,best_epoch,accuracy,macro_f1,seconds
+42,baseline,15,6,0.9075,0.9066,902.38
+42,augmented,15,15,0.9175,0.9177,1359.42
+43,baseline,15,13,0.8975,0.8976,938.76
+43,augmented,15,15,0.9175,0.9175,1021.69
+44,baseline,15,11,0.925,0.9254,899.98
+44,augmented,15,12,0.92,0.92,954.41

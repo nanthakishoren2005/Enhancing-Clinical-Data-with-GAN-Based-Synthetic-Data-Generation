@@ -1,0 +1,3 @@
+regime,baseline_accuracy_verified,baseline_macro_f1_checkpoint_eval,baseline_accuracy_checkpoint_eval,filtered_augmented_accuracy,filtered_augmented_macro_f1,delta_accuracy_vs_verified,kept_normal,kept_covid,kept_lung_opacity,kept_viral_pneumonia,kept_total,note
+full_data,92.75,0.9277,0.9275,0.9175,0.9177,-1.0,0,100,2,85,187,Full-data arm: real train + filtered synthetics. Baseline NOT retrained.
+low_data,83.0,,,,,,0,100,2,85,187,BLOCKED: data_low/ not present on this machine; pending Kaggle results zip.

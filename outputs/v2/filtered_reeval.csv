@@ -1,0 +1,3 @@
+model,checkpoint,architecture,accuracy,macro_f1,f1_normal,f1_covid,f1_lung_opacity,f1_viral_pneumonia,note
+baseline,C:\Users\nanth\OneDrive\Desktop\final yr project final\checkpoints\baseline_best.pt,resnet18,0.9275,0.9277,0.8889,0.949,0.8877,0.9851,Verified baseline reference (92.75% acc / 92.77% macro F1)
+filtered_augmented,C:\Users\nanth\OneDrive\Desktop\final yr project final\outputs\v2\filtered_augmented_full_best.pt,resnet18,0.9175,0.9177,0.8966,0.9081,0.8762,0.9901,Task 5 filtered-augmented clean run (trained on 187 filtered synthetics)

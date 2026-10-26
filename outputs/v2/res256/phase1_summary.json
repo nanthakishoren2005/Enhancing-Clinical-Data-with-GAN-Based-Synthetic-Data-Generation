@@ -1,0 +1,209 @@
+{
+  "phase": "1",
+  "description": "256x256 Conditional DCGAN",
+  "baseline_accuracy_128": 0.9275,
+  "baseline_macro_f1_128": 0.9277,
+  "results": {
+    "cnn_training": {
+      "best_epoch": 14,
+      "best_val_loss": 0.13478573171712924,
+      "best_val_acc": 0.955,
+      "checkpoint_path": "/kaggle/working/Enhancing-Clinical-Data-with-GAN-Based-Synthetic-Data-Generation/outputs/v2/res256/cnn256_best.pt",
+      "history": {
+        "train_loss": [
+          0.625431356827418,
+          0.4016085010766983,
+          0.34412000233928364,
+          0.27307846017181875,
+          0.2783655653645595,
+          0.24646266764650743,
+          0.22988306858887275,
+          0.21147227951635916,
+          0.20764545656740666,
+          0.17978279812261463,
+          0.16863934451093276,
+          0.11088421237034102,
+          0.08189569009157519,
+          0.0718036966957152,
+          0.06812153281333545
+        ],
+        "train_acc": [
+          0.7654166666666666,
+          0.8516666666666667,
+          0.8675,
+          0.8933333333333333,
+          0.9020833333333333,
+          0.91125,
+          0.9179166666666667,
+          0.9204166666666667,
+          0.92,
+          0.9316666666666666,
+          0.9375,
+          0.9595833333333333,
+          0.97125,
+          0.9766666666666667,
+          0.975
+        ],
+        "val_loss": [
+          0.6609560146182776,
+          0.45729931416420866,
+          0.3121645125944633,
+          0.22293699138390366,
+          0.225888778232038,
+          0.29019055485725403,
+          0.21536382235586643,
+          0.17869195865700022,
+          0.367319150865078,
+          0.26753226290595195,
+          0.2688270664587617,
+          0.1722550293058157,
+          0.17746173056773842,
+          0.13478573171712924,
+          0.169542219764553
+        ],
+        "val_acc": [
+          0.7475,
+          0.8425,
+          0.87,
+          0.92,
+          0.925,
+          0.9075,
+          0.9125,
+          0.9225,
+          0.8675,
+          0.91,
+          0.8925,
+          0.945,
+          0.945,
+          0.955,
+          0.94
+        ],
+        "epochs": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "training_time_seconds": 366.88
+      },
+      "img_size": 256
+    },
+    "test_metrics": {
+      "accuracy": 0.94,
+      "macro_precision": 0.9417,
+      "macro_recall": 0.94,
+      "macro_f1": 0.9405,
+      "weighted_precision": 0.9417,
+      "weighted_recall": 0.94,
+      "weighted_f1": 0.9405,
+      "macro_sensitivity": 0.94,
+      "macro_specificity": 0.98,
+      "confusion_matrix": [
+        [
+          93,
+          0,
+          7,
+          0
+        ],
+        [
+          1,
+          94,
+          4,
+          1
+        ],
+        [
+          10,
+          0,
+          90,
+          0
+        ],
+        [
+          1,
+          0,
+          0,
+          99
+        ]
+      ],
+      "per_class": {
+        "normal": {
+          "precision": 0.8857,
+          "recall": 0.93,
+          "f1_score": 0.9073,
+          "sensitivity": 0.93,
+          "specificity": 0.96,
+          "support": 100
+        },
+        "covid": {
+          "precision": 1.0,
+          "recall": 0.94,
+          "f1_score": 0.9691,
+          "sensitivity": 0.94,
+          "specificity": 1.0,
+          "support": 100
+        },
+        "lung_opacity": {
+          "precision": 0.8911,
+          "recall": 0.9,
+          "f1_score": 0.8955,
+          "sensitivity": 0.9,
+          "specificity": 0.9633,
+          "support": 100
+        },
+        "viral_pneumonia": {
+          "precision": 0.99,
+          "recall": 0.99,
+          "f1_score": 0.99,
+          "sensitivity": 0.99,
+          "specificity": 0.9967,
+          "support": 100
+        }
+      },
+      "ovr_details": {
+        "normal": {
+          "tp": 93,
+          "fn": 7,
+          "fp": 12,
+          "tn": 288,
+          "sensitivity": 0.93,
+          "specificity": 0.96
+        },
+        "covid": {
+          "tp": 94,
+          "fn": 6,
+          "fp": 0,
+          "tn": 300,
+          "sensitivity": 0.94,
+          "specificity": 1.0
+        },
+        "lung_opacity": {
+          "tp": 90,
+          "fn": 10,
+          "fp": 11,
+          "tn": 289,
+          "sensitivity": 0.9,
+          "specificity": 0.9633
+        },
+        "viral_pneumonia": {
+          "tp": 99,
+          "fn": 1,
+          "fp": 1,
+          "tn": 299,
+          "sensitivity": 0.99,
+          "specificity": 0.9967
+        }
+      },
+      "sample_count": 400
+    }
+  }
+}

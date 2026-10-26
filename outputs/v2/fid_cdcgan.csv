@@ -1,0 +1,6 @@
+class,real,synthetic,fid
+Normal,600,150,307.8718
+Covid,600,150,289.6449
+Lung_opacity,600,150,272.2505
+Viral_pneumonia,600,150,328.3917
+OVERALL,2400,600,264.5012
