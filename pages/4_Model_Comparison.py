@@ -9,6 +9,7 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 from src.utils.config import load_config, get_project_root
 from src.evaluation.compare_models import run_model_comparison
@@ -172,24 +173,165 @@ if eval_json.exists():
         df_summary = pd.DataFrame(data["summary"])
         st.dataframe(df_summary, use_container_width=True)
 
-        barchart_img = figures_dir / "metric_comparison_barchart.png"
-        if barchart_img.exists():
-            st.image(str(barchart_img), caption="Macro Metric Comparison Bar Chart (Held-Out Test Set)", use_container_width=True)
+        # Metric comparison bar chart — generated inline from verified test metrics
+        # (same data source as the table above, so bars always match the table)
+        metrics_to_plot = [
+            ("accuracy", "Accuracy"),
+            ("macro_precision", "Macro Precision"),
+            ("macro_recall", "Macro Recall (Sensitivity)"),
+            ("macro_f1", "Macro F1-Score"),
+            ("macro_specificity", "Macro Specificity"),
+            ("weighted_f1", "Weighted F1-Score"),
+        ]
+        labels = [m[1] for m in metrics_to_plot]
+        base_vals = [b_met[m[0]] * 100 if b_met else 0.0 for m in metrics_to_plot]
+        aug_vals = [a_met[m[0]] * 100 if a_met else 0.0 for m in metrics_to_plot]
+
+        x = np.arange(len(labels))
+        bar_width = 0.35
+
+        fig_bar, ax_bar = plt.subplots(figsize=(10, 4))
+        rects1 = ax_bar.bar(x - bar_width / 2, base_vals, bar_width, label="Baseline CNN", color="#0284c7")
+        rects2 = ax_bar.bar(x + bar_width / 2, aug_vals, bar_width, label="GAN-Augmented CNN", color="#10b981")
+
+        ax_bar.set_ylabel("Score (%)", fontsize=10, fontweight="bold")
+        ax_bar.set_title("Comparative Performance: Baseline vs. GAN-Augmented CNN", fontsize=12, fontweight="bold")
+        ax_bar.set_xticks(x)
+        ax_bar.set_xticklabels(labels, fontsize=9)
+        ax_bar.set_ylim(0, 105)
+        ax_bar.legend(loc="lower right", framealpha=0.95)
+        ax_bar.grid(axis="y", linestyle=":", alpha=0.6)
+        ax_bar.spines["top"].set_visible(False)
+        ax_bar.spines["right"].set_visible(False)
+
+        # Annotate values on bars
+        for bar in rects1:
+            h = bar.get_height()
+            if h > 0:
+                ax_bar.annotate(f"{h:.1f}%", xy=(bar.get_x() + bar.get_width() / 2, h),
+                                xytext=(0, 3), textcoords="offset points", ha="center", va="bottom",
+                                fontsize=8, color="#0284c7")
+        for bar in rects2:
+            h = bar.get_height()
+            if h > 0:
+                ax_bar.annotate(f"{h:.1f}%", xy=(bar.get_x() + bar.get_width() / 2, h),
+                                xytext=(0, 3), textcoords="offset points", ha="center", va="bottom",
+                                fontsize=8, color="#10b981")
+
+        plt.tight_layout()
+        st.pyplot(fig_bar, use_container_width=True)
+        plt.close(fig_bar)
 
     with tab2:
         st.markdown("### Side-by-Side Confusion Matrices (Held-Out Test Set)")
-        cm_img = figures_dir / "confusion_matrix_comparison.png"
-        if cm_img.exists():
-            st.image(str(cm_img), caption="Baseline vs GAN-Augmented Confusion Matrix Heatmaps (Normalized)", use_container_width=True)
+
+        class_label_map = {
+            "normal": "Normal",
+            "covid": "COVID-19",
+            "lung_opacity": "Lung Opacity",
+            "viral_pneumonia": "Viral Pneumonia",
+        }
+        labels_display = [class_label_map[c] for c in ["normal", "covid", "lung_opacity", "viral_pneumonia"]]
+
+        fig_cm, axes = plt.subplots(1, 2, figsize=(14, 5.5))
+
+        # Left: Baseline (Model A)
+        cm_b = np.array(b_met["confusion_matrix"])
+        cm_b_norm = cm_b.astype("float") / cm_b.sum(axis=1)[:, np.newaxis]
+        cm_b_norm = np.nan_to_num(cm_b_norm)
+        annot_b = np.empty_like(cm_b).astype(str)
+        for i in range(cm_b.shape[0]):
+            for j in range(cm_b.shape[1]):
+                annot_b[i, j] = f"{int(cm_b[i, j])}\n({cm_b_norm[i, j]*100:.1f}%)"
+        sns.heatmap(
+            cm_b,
+            annot=annot_b,
+            fmt="",
+            cmap="Blues",
+            xticklabels=labels_display,
+            yticklabels=labels_display,
+            cbar=False,
+            ax=axes[0],
+            linewidths=1,
+            linecolor="#e0e0e0",
+        )
+        axes[0].set_title("Model A — Baseline CNN (128x128)", fontsize=12, fontweight="bold", pad=10)
+        axes[0].set_xlabel("Predicted Class", fontsize=10)
+        axes[0].set_ylabel("True Class", fontsize=10)
+
+        # Right: GAN-Augmented (Model B)
+        cm_a = np.array(a_met["confusion_matrix"])
+        cm_a_norm = cm_a.astype("float") / cm_a.sum(axis=1)[:, np.newaxis]
+        cm_a_norm = np.nan_to_num(cm_a_norm)
+        annot_a = np.empty_like(cm_a).astype(str)
+        for i in range(cm_a.shape[0]):
+            for j in range(cm_a.shape[1]):
+                annot_a[i, j] = f"{int(cm_a[i, j])}\n({cm_a_norm[i, j]*100:.1f}%)"
+        sns.heatmap(
+            cm_a,
+            annot=annot_a,
+            fmt="",
+            cmap="Greens",
+            xticklabels=labels_display,
+            yticklabels=labels_display,
+            cbar=False,
+            ax=axes[1],
+            linewidths=1,
+            linecolor="#e0e0e0",
+        )
+        axes[1].set_title("Model B — GAN-Augmented CNN (128x128)", fontsize=12, fontweight="bold", pad=10)
+        axes[1].set_xlabel("Predicted Class", fontsize=10)
+        axes[1].set_ylabel("True Class", fontsize=10)
+
+        plt.suptitle("Confusion Matrix Comparison: Baseline vs. GAN-Augmented (Held-Out Test Set)", fontsize=14, fontweight="bold", y=1.02)
+        plt.tight_layout()
+        st.pyplot(fig_cm, use_container_width=True)
+        plt.close(fig_cm)
 
     with tab3:
         st.markdown("### Per-Class Precision, Recall (Sensitivity), Specificity & F1")
         df_per_class = pd.DataFrame(data["per_class"])
         st.dataframe(df_per_class, use_container_width=True)
 
-        f1_chart = figures_dir / "per_class_f1_comparison.png"
-        if f1_chart.exists():
-            st.image(str(f1_chart), caption="Per-Class F1-Score Comparison", use_container_width=True)
+        # Per-Class F1-Score Comparison chart — generated inline from verified per-class data
+        classes_order = ["normal", "covid", "lung_opacity", "viral_pneumonia"]
+        labels_display = [class_label_map[c] for c in classes_order]
+        base_f1_vals = [b_met["per_class"][c]["f1_score"] * 100 for c in classes_order]
+        aug_f1_vals = [a_met["per_class"][c]["f1_score"] * 100 for c in classes_order]
+
+        fig_f1, ax_f1 = plt.subplots(figsize=(7.5, 3.2))
+        y_pos = np.arange(len(classes_order))
+        bar_width = 0.35
+
+        rects1 = ax_f1.barh(y_pos - bar_width / 2, base_f1_vals, bar_width, label="Baseline CNN", color="#0284c7")
+        rects2 = ax_f1.barh(y_pos + bar_width / 2, aug_f1_vals, bar_width, label="GAN-Augmented CNN", color="#10b981")
+
+        ax_f1.set_xlabel("F1-Score (%)", fontsize=9, fontweight="bold")
+        ax_f1.set_yticks(y_pos)
+        ax_f1.set_yticklabels(labels_display, fontsize=9, fontweight="bold")
+        ax_f1.set_xlim(0, 105)
+        ax_f1.legend(loc="lower right", framealpha=0.95)
+        ax_f1.grid(axis="x", linestyle=":", alpha=0.6)
+        ax_f1.spines["top"].set_visible(False)
+        ax_f1.spines["right"].set_visible(False)
+
+        # Annotate values on bars
+        for bar in rects1:
+            w = bar.get_width()
+            if w > 0:
+                ax_f1.annotate(f"{w:.1f}%", xy=(w, bar.get_y() + bar.get_height() / 2),
+                               xytext=(4, 0), textcoords="offset points", ha="left", va="center",
+                               fontsize=8, color="#0284c7")
+        for bar in rects2:
+            w = bar.get_width()
+            if w > 0:
+                ax_f1.annotate(f"{w:.1f}%", xy=(w, bar.get_y() + bar.get_height() / 2),
+                               xytext=(4, 0), textcoords="offset points", ha="left", va="center",
+                               fontsize=8, color="#047857", fontweight="bold")
+
+        plt.tight_layout()
+        st.pyplot(fig_f1, use_container_width=True)
+        plt.close(fig_f1)
 
         st.markdown("---")
         st.markdown("""
@@ -310,3 +452,49 @@ if eval_json.exists():
             st.info("Select or upload an image above to compare Grad-CAM++ explanations between Model A and Model B.")
 else:
     st.info("Click 'Evaluate Both Models on Real Test Set' above to generate empirical metrics and confusion matrices.")
+
+# Phase 1: 256x256 additional section (append-only; existing rows/text unchanged)
+phase1_json_path = root / "outputs" / "v2" / "res256" / "phase1_summary.json"
+if phase1_json_path.exists():
+    st.markdown("---")
+    st.markdown("### Phase 1: 256x256 Conditional DCGAN (Additional Experiment)")
+
+    with open(phase1_json_path, "r", encoding="utf-8") as _f:
+        _p1 = json.load(_f)
+
+    _p1_metrics = _p1["results"]["test_metrics"]
+    _p1_acc = _p1_metrics["accuracy"] * 100
+    _p1_f1 = _p1_metrics["macro_f1"]
+    _base_acc = _p1["baseline_accuracy_128"] * 100
+    _base_f1 = _p1["baseline_macro_f1_128"]
+    _p1_delta = _p1_acc - _base_acc
+
+    st.markdown(f"""
+    <div class="med-card">
+        <div style="display: flex; justify-content: space-between; gap: 20px;">
+            <div>
+                <div style="font-weight: 700; color: var(--med-text-primary); font-size: 1.1rem;">Phase 1 (256x256, 100 synthetics/class)</div>
+                <div style="font-size: 1.6rem; font-weight: 800; color: #10b981;">{_p1_acc:.2f}%</div>
+                <div style="font-size: 0.85rem; color: var(--med-text-muted);">Macro F1: {_p1_f1:.4f}</div>
+            </div>
+            <div style="text-align: right;">
+                <div style="font-weight: 700; color: #0284c7;">Baseline (128x128)</div>
+                <div style="font-size: 1.6rem; font-weight: 800; color: var(--med-text-primary);">{_base_acc:.2f}%</div>
+                <div style="font-size: 0.85rem; color: var(--med-text-muted);">Macro F1: {_base_f1:.4f}</div>
+            </div>
+        </div>
+        <div style="margin-top: 0.8rem; color: var(--med-text-muted);">{_p1_delta:+.2f}pp accuracy gain vs Baseline</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("""
+    <div class="med-card" style="border-left: 5px solid #f59e0b; padding: 0.9rem 1.2rem; margin-top: 1rem;">
+        <h4 style="margin-top: 0; color: var(--med-text-primary);">Important Caveat</h4>
+        <p style="color: var(--med-text-secondary); line-height: 1.6;">
+            Phase 1 changed two things at once — input resolution (128 to 256) and synthetic augmentation (100 per class) — 
+            so the gain cannot be credited to synthetic data alone. A 256 real-only control would be needed to separate the two effects.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+else:
+    st.info("Phase 1 results not found at outputs/v2/res256/phase1_summary.json")
