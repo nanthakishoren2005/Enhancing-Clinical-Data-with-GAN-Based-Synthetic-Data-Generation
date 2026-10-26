@@ -129,7 +129,7 @@ Both Model A and Model B use ResNet-18 with identical hyperparameters:
 - **Experiment 1 (40 synthetic/class):** Hurt accuracy compared to Baseline. Normal recall dropped to 0.69 due to Normal vs Lung Opacity confusion.
 - **Experiment 2 (100 synthetic/class):** Fixed the Normal vs Lung Opacity confusion (Normal recall improved to 0.90) and matched the Baseline within 1 test image (92.50% vs 92.75%).
 - Phase 1 (256x256 cDCGAN) beat the Baseline (94.00% vs 92.75%), but it changed input resolution (128 to 256) and synthetic augmentation together, so the gain cannot be credited to synthetic data alone. A 256 real-only control would be needed to separate the two effects.
-- **Conclusion:** GAN augmentation did not beat the Baseline. The larger synthetic set (100 per class) recovered performance to near-baseline levels but did not exceed it. Both experiments are reported honestly; no claim is made that GAN augmentation improved over the Baseline.
+- **Conclusion:** At 128x128, GAN augmentation did not beat the Baseline. The larger synthetic set (100 per class) recovered performance to near-baseline levels but did not exceed it. Both experiments are reported honestly; no claim is made that GAN augmentation improved over the Baseline.
 
 ---
 
