@@ -1,0 +1,65 @@
+# ==============================================================================
+# Configuration file for 256x256 Conditional DCGAN (Phase 1)
+# Separate config — do NOT edit configs/config.yaml
+# ==============================================================================
+
+project:
+  title: "256x256 Conditional DCGAN for Chest X-ray Synthesis (Phase 1)"
+  version: "1.0.0"
+  random_seed: 42
+
+dataset:
+  classes:
+    - "normal"
+    - "covid"
+    - "lung_opacity"
+    - "viral_pneumonia"
+  num_classes: 4
+  image_size: 256
+  channels: 3
+  mean: [0.485, 0.456, 0.406]
+  std: [0.229, 0.224, 0.225]
+  original_dir: "data/original"
+  synthetic_dir: "data/synthetic"
+
+gan:
+  latent_dim: 100
+  embedding_dim: 32
+  gen_feature_maps: 64
+  disc_feature_maps: 64
+  lr_g: 0.0002
+  lr_d: 0.0002
+  beta1: 0.5
+  beta2: 0.999
+  batch_size: 16
+  epochs: 50
+  save_sample_interval: 2
+  num_synthetic_per_class: 100
+
+cnn:
+  architecture: "resnet18"
+  pretrained: true
+  freeze_backbone: false
+  batch_size: 16
+  learning_rate: 0.0003
+  weight_decay: 0.0001
+  epochs: 15
+  early_stopping_patience: 5
+
+paths:
+  checkpoints_dir: "checkpoints"
+  figures_dir: "outputs/figures"
+  reports_dir: "outputs/reports"
+  samples_dir: "outputs/gan_samples"
+
+v2_res256:
+  output_dir: "outputs/v2/res256"
+  gan_checkpoint: "outputs/v2/res256/cgan256_checkpoint.pt"
+  synthetic_dir: "outputs/v2/res256/synthetic"
+  classifier_checkpoint: "outputs/v2/res256/cnn256_best.pt"
+  fid_report: "outputs/v2/res256/fid_comparison.json"
+  metrics_report: "outputs/v2/res256/metrics_comparison.json"
+
+hardware:
+  device: "auto"
+  num_workers: 0
